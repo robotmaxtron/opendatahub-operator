@@ -4,10 +4,10 @@ metadata:
   name: default-dsc
   labels:
     app.kubernetes.io/name: datasciencecluster
-    app.kubernetes.io/instance: default-dsc
-    app.kubernetes.io/part-of: rhods-operator
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: opendatahub-operator
     app.kubernetes.io/managed-by: kustomize
-    app.kubernetes.io/created-by: rhods-operator
+    app.kubernetes.io/created-by: opendatahub-operator
 spec:
   components:
     codeflare:
@@ -21,6 +21,7 @@ spec:
       nim: {
         managementState: "Managed"
       },
+      rawDeploymentServiceConfig: "Headed",
       serving: {
         ingressGateway: {
           certificate: {
@@ -44,7 +45,7 @@ spec:
     trustyai:
       managementState: "Managed"
     modelregistry:
-      managementState: "Removed"
-      registriesNamespace: "rhoai-model-registries"
+      managementState: "Managed"
+      registriesNamespace: "odh-model-registries"
     feastoperator:
-      managementState: "Removed"
+      managementState: "Managed"

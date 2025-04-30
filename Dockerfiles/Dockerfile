@@ -11,7 +11,6 @@ ARG OVERWRITE_MANIFESTS=""
 USER root
 WORKDIR /
 COPY opt/manifests/ /opt/manifests/
-
 COPY get_all_manifests.sh get_all_manifests.sh
 RUN if [ "${USE_LOCAL}" != "true" ]; then \
         rm -rf /opt/manifests/*; \

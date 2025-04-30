@@ -256,7 +256,6 @@ spec:
                         enum:
                         - Serverless
                         - RawDeployment
-                        pattern: ^(Serverless|RawDeployment)$
                         type: string
                       devFlags:
                         description: Add developer fields
@@ -315,13 +314,12 @@ spec:
                         default: Headless
                         description: |-
                           Configures the type of service that is created for InferenceServices using RawDeployment.
-                          The values for RawDeploymentServiceConfig can be "Headless" or "Headed".
-                          Headless : sets "ServiceClusterIPNone = true" in the 'inferenceservice-config' configmap for Kserve.
-                          Headed : sets "ServiceClusterIPNone = false" in the 'inferenceservice-config' configmap for Kserve.
+                          The values for RawDeploymentServiceConfig can be "Headless" (default value) or "Headed".
+                          Headless: to set "ServiceClusterIPNone = true" in the 'inferenceservice-config' configmap for Kserve.
+                          Headed: to set "ServiceClusterIPNone = false" in the 'inferenceservice-config' configmap for Kserve.
                         enum:
                         - Headless
                         - Headed
-                        pattern: ^(Headless|Headed)$
                         type: string
                       serving:
                         description: |-
@@ -520,10 +518,10 @@ spec:
                         pattern: ^(Managed|Unmanaged|Force|Removed)$
                         type: string
                       registriesNamespace:
-                        default: rhoai-model-registries
+                        default: odh-model-registries
                         description: Namespace for model registries to be installed,
                           configurable only once when model registry is enabled, defaults
-                          to "rhoai-model-registries"
+                          to "odh-model-registries"
                         maxLength: 63
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?)?$
                         type: string
@@ -724,6 +722,9 @@ spec:
                         maxLength: 63
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?)?$
                         type: string
+                        x-kubernetes-validations:
+                        - message: WorkbenchNamespace is immutable
+                          rule: self == oldSelf
                     type: object
                 type: object
             type: object

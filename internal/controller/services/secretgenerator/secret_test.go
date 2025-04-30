@@ -2,9 +2,8 @@ package secretgenerator_test
 
 import (
 	"errors"
+	"github.com/opendatahub-io/opendatahub-operator/v2/internal/controller/services/secretgenerator"
 	"testing"
-
-	"github.com/opendatahub-io/opendatahub-operator/v2/internal/controller/secretgenerator"
 )
 
 const (

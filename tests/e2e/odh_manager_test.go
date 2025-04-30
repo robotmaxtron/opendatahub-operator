@@ -25,7 +25,7 @@ func odhOperatorTestSuite(t *testing.T) {
 
 	// Define test cases.
 	testCases := []TestCase{
-		{name: "Validate RHOAI Operator pod", testFn: operatorTestCtx.testODHDeployment},
+		{name: "Validate ODH Operator pod", testFn: operatorTestCtx.testODHDeployment},
 		{name: "Validate CRDs owned by the operator", testFn: operatorTestCtx.ValidateOwnedCRDs},
 	}
 
@@ -38,7 +38,7 @@ func (tc *OperatorTestCtx) testODHDeployment(t *testing.T) {
 	t.Helper()
 
 	// Verify if the operator deployment is created
-	controllerDeployment := "rhods-operator"
+	controllerDeployment := "opendatahub-operator-controller-manager"
 	tc.EnsureDeploymentReady(types.NamespacedName{Namespace: tc.OperatorNamespace, Name: controllerDeployment}, 1)
 }
 

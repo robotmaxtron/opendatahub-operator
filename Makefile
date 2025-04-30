@@ -3,7 +3,7 @@
 # To re-generate a bundle for another specific version without changing the standard setup, you can:
 # - use the VERSION as arg of the bundle target (e.g make bundle VERSION=0.0.2)
 # - use environment variables to overwrite this value (e.g export VERSION=0.0.2)
-VERSION ?= 2.18.0
+VERSION ?= 2.27.0
 # IMAGE_TAG_BASE defines the opendatahub.io namespace and part of the image name for remote images.
 # This variable is used to construct full image tags for bundle and catalog images.
 #
@@ -20,12 +20,12 @@ IMG ?= $(IMAGE_TAG_BASE):$(IMG_TAG)
 BUNDLE_IMG ?= $(IMAGE_TAG_BASE)-bundle:v$(VERSION)
 
 IMAGE_BUILDER ?= podman
-OPERATOR_NAMESPACE ?= redhat-ods-operator
+OPERATOR_NAMESPACE ?= opendatahub-operator-system
 DEFAULT_MANIFESTS_PATH ?= opt/manifests
 CGO_ENABLED ?= 1
-CHANNELS="alpha,stable,fast"
 USE_LOCAL = false
 
+CHANNELS="fast"
 # CHANNELS define the bundle channels used in the bundle.
 # Add a new line here if you would like to change its default config. (E.g CHANNELS = "candidate,fast,stable")
 # To re-generate a bundle for other specific channels without changing the standard setup, you can:
@@ -35,7 +35,7 @@ ifneq ($(origin CHANNELS), undefined)
 BUNDLE_CHANNELS := --channels=$(CHANNELS)
 endif
 
-DEFAULT_CHANNEL="stable"
+DEFAULT_CHANNEL="fast"
 # DEFAULT_CHANNEL defines the default channel used in the bundle.
 # Add a new line here if you would like to change its default config. (E.g DEFAULT_CHANNEL = "stable")
 # To re-generate a bundle for any other default channel without changing the default setup, you can:
@@ -154,7 +154,7 @@ endef
 
 .PHONY: manifests
 manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
-	$(CONTROLLER_GEN) rbac:roleName=rhods-operator-role crd:ignoreUnexportedFields=true webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+	$(CONTROLLER_GEN) rbac:roleName=controller-manager-role crd:ignoreUnexportedFields=true webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 	$(call fetch-external-crds,github.com/openshift/api,route/v1)
 	$(call fetch-external-crds,github.com/openshift/api,user/v1)
 
@@ -285,13 +285,10 @@ $(OPERATOR_SDK): $(LOCALBIN)
 	test -s $(OPERATOR_SDK) || curl -sSLo $(OPERATOR_SDK) $(OPERATOR_SDK_DL_URL)/operator-sdk_$${OS}_$${ARCH} && \
 	chmod +x $(OPERATOR_SDK) ;\
 
-
-GOLANGCI_LINT_INSTALL_SCRIPT ?= 'https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh'
 .PHONY: golangci-lint
 golangci-lint: $(GOLANGCI_LINT) ## Download golangci-lint locally if necessary.
 $(GOLANGCI_LINT): $(LOCALBIN)
 	$(call go-install-tool,$(GOLANGCI_LINT),github.com/golangci/golangci-lint/cmd/golangci-lint,${GOLANGCI_LINT_VERSION})
-
 
 OS=$(shell uname -s)
 ARCH=$(shell uname -m)
@@ -318,7 +315,8 @@ bundle: prepare operator-sdk ## Generate bundle manifests and metadata, then val
 	$(KUSTOMIZE) build config/manifests | $(OPERATOR_SDK) generate bundle $(BUNDLE_GEN_FLAGS) 2>&1 | grep -v $(WARNINGMSG)
 	$(OPERATOR_SDK) bundle validate ./$(BUNDLE_DIR) 2>&1 | grep -v $(WARNINGMSG)
 	mv bundle.Dockerfile Dockerfiles/
-	rm -f bundle/manifests/rhods-operator-webhook-service_v1_service.yaml
+	rm -f bundle/manifests/opendatahub-operator-webhook-service_v1_service.yaml
+
 .PHONY: bundle-build
 bundle-build: bundle
 	$(IMAGE_BUILDER) build --no-cache -f Dockerfiles/bundle.Dockerfile -t $(BUNDLE_IMG) .

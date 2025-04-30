@@ -119,7 +119,6 @@ func (tc *TrustyAITestCtx) DeleteInferenceServices(t *testing.T) {
 			&client.DeleteOptions{
 				PropagationPolicy: &propagationPolicy,
 			}),
-		WithWaitForDeletion(true),
 	)
 }
 

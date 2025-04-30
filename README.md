@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/github/opendatahub-io/opendatahub-operator/graph/badge.svg?token=QN7G7IVSYA)](https://codecov.io/github/opendatahub-io/opendatahub-operator)
 
-This operator is the primary operator for Open Data Hub. It is responsible for enabling Data science applications like 
+This operator is the primary operator for Open Data Hub. It is responsible for enabling Data science applications like
 Jupyter Notebooks, Modelmesh serving, Datascience pipelines etc. The operator makes use of `DataScienceCluster` CRD to deploy
 and configure these applications.
 
@@ -342,7 +342,7 @@ spec:
       managementState: Managed
     modelregistry:
       managementState: Managed
-      registriesNamespace: "rhoai-model-registries"
+      registriesNamespace: "odh-model-registries"
     ray:
       managementState: Managed
     trainingoperator:
@@ -361,7 +361,7 @@ spec:
 apiVersion: datasciencecluster.opendatahub.io/v1
 kind: DataScienceCluster
 metadata:
-  name: default-dsc
+  name: example
 spec:
   components:
     dashboard:
@@ -400,7 +400,7 @@ following environment variables must be set when running locally:
 export KUBECONFIG=/path/to/kubeconfig
 ```
 
-Ensure when testing RHOAI operator in dev mode, no ODH CSV exists
+Ensure when testing RHODS operator in dev mode, no ODH CSV exists
 Once the above variables are set, run the following:
 
 ```shell

@@ -45,7 +45,7 @@ func (s *componentHandler) Init(_ common.Platform) error {
 		platformVersionParamsKey: release.Version.String(),
 	}
 	if err := deploy.ApplyParams(paramsPath, imageParamMap, extraParams); err != nil {
-		return fmt.Errorf("failed to apply params on path %s: %w", paramsPath, err)
+		return fmt.Errorf("failed to update images on path %s: %w", paramsPath, err)
 	}
 
 	return nil

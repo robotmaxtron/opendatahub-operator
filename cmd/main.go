@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"os"
 
-	addonv1alpha1 "github.com/openshift/addon-operator/apis/addons/v1alpha1"
 	ocappsv1 "github.com/openshift/api/apps/v1" //nolint:importas //reason: conflicts with appsv1 "k8s.io/api/apps/v1"
 	buildv1 "github.com/openshift/api/build/v1"
 	configv1 "github.com/openshift/api/config/v1"
@@ -50,7 +49,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
-	apiregistrationv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -114,7 +112,6 @@ func init() { //nolint:gochecknoinits
 	utilruntime.Must(dscv1.AddToScheme(scheme))
 	utilruntime.Must(featurev1.AddToScheme(scheme))
 	utilruntime.Must(networkingv1.AddToScheme(scheme))
-	utilruntime.Must(addonv1alpha1.AddToScheme(scheme))
 	utilruntime.Must(rbacv1.AddToScheme(scheme))
 	utilruntime.Must(corev1.AddToScheme(scheme))
 	utilruntime.Must(routev1.Install(scheme))
@@ -128,7 +125,6 @@ func init() { //nolint:gochecknoinits
 	utilruntime.Must(imagev1.Install(scheme))
 	utilruntime.Must(apiextensionsv1.AddToScheme(scheme))
 	utilruntime.Must(admissionregistrationv1.AddToScheme(scheme))
-	utilruntime.Must(apiregistrationv1.AddToScheme(scheme))
 	utilruntime.Must(promv1.AddToScheme(scheme))
 	utilruntime.Must(operatorv1.Install(scheme))
 	utilruntime.Must(consolev1.AddToScheme(scheme))
@@ -161,7 +157,7 @@ func main() { //nolint:funlen,maintidx
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
-	flag.StringVar(&monitoringNamespace, "dsc-monitoring-namespace", "redhat-ods-monitoring", "The namespace where data science cluster "+
+	flag.StringVar(&monitoringNamespace, "dsc-monitoring-namespace", "opendatahub", "The namespace where data science cluster "+
 		"monitoring stack will be deployed")
 	flag.StringVar(&logmode, "log-mode", "", "Log mode ('', prod, devel), default to ''")
 	flag.StringVar(&pprofAddr, "pprof-bind-address", os.Getenv("PPROF_BIND_ADDRESS"), "The address that pprof binds to. "+
@@ -495,8 +491,7 @@ func createSecretCacheConfig(ctx context.Context, cli client.Client, platform co
 
 func createODHGeneralCacheConfig(ctx context.Context, cli client.Client, platform common.Platform) (map[string]cache.Config, error) {
 	namespaceConfigs := map[string]cache.Config{
-		"istio-system":        {}, // for serivcemonitor: data-science-smcp-pilot-monitor
-		"openshift-operators": {}, // for dependent operators installed namespace
+		"istio-system": {}, // for serivcemonitor: data-science-smcp-pilot-monitor
 	}
 
 	c, err := getCommonCache(ctx, cli, platform)

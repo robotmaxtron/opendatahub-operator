@@ -63,15 +63,13 @@ To deploy ODH components seamlessly, ODH operator will watch two CRDs:
           modelmeshserving:
             managementState: Managed
           modelregistry:
-            managementState: Removed
-            registriesNamespace: "rhoai-model-registries"
+            managementState: Managed
+            registriesNamespace: "odh-model-registries"
           ray:
             managementState: Managed
           kueue:
             managementState: Managed
           trainingoperator:
-            managementState: Managed
-          trustyai:
             managementState: Managed
           workbenches:
             managementState: Managed
@@ -94,17 +92,4 @@ To deploy ODH components seamlessly, ODH operator will watch two CRDs:
             managementState: Managed
           workbenches:
             managementState: Managed 
-    ```
-
-3. Enable Data Science Pipelines
-
-    ```console
-      apiVersion: datasciencecluster.opendatahub.io/v1
-      kind: DataScienceCluster
-      metadata:
-        name: example
-      spec:
-        components:
-          datasciencepipelines:
-            managementState: Managed
     ```
