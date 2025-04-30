@@ -67,7 +67,7 @@ var managementStateChangeTrustedCA = false
 
 // DSCInitializationReconciler reconciles a DSCInitialization object.
 type DSCInitializationReconciler struct {
-	client.Client
+	Client   client.Client
 	Scheme   *runtime.Scheme
 	Recorder record.EventRecorder
 }
@@ -104,19 +104,16 @@ func (r *DSCInitializationReconciler) Reconcile(ctx context.Context, req ctrl.Re
 		}
 	}
 
-	if instance.ObjectMeta.DeletionTimestamp.IsZero() {
+	if instance.DeletionTimestamp.IsZero() {
 		if !controllerutil.ContainsFinalizer(instance, finalizerName) {
 			log.Info("Adding finalizer for DSCInitialization", "name", instance.Name, "finalizer", finalizerName)
 			controllerutil.AddFinalizer(instance, finalizerName)
-			if err := r.Update(ctx, instance); err != nil {
+			if err := r.Client.Update(ctx, instance); err != nil {
 				return ctrl.Result{}, err
 			}
 		}
 	} else {
 		log.Info("Finalization DSCInitialization start deleting instance", "name", instance.Name, "finalizer", finalizerName)
-		if err := r.removeServiceMesh(ctx, instance); err != nil {
-			return reconcile.Result{}, err
-		}
 
 		err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
 			newInstance := &dsciv1.DSCInitialization{}
@@ -125,7 +122,7 @@ func (r *DSCInitializationReconciler) Reconcile(ctx context.Context, req ctrl.Re
 			}
 			if controllerutil.ContainsFinalizer(newInstance, finalizerName) {
 				controllerutil.RemoveFinalizer(newInstance, finalizerName)
-				if err := r.Update(ctx, newInstance); err != nil {
+				if err := r.Client.Update(ctx, newInstance); err != nil {
 					return err
 				}
 			}
@@ -258,10 +255,6 @@ func (r *DSCInitializationReconciler) Reconcile(ctx context.Context, req ctrl.Re
 			}
 		}
 
-		// Apply Service Mesh configurations
-		if errServiceMesh := r.configureServiceMesh(ctx, instance); errServiceMesh != nil {
-			return reconcile.Result{}, errServiceMesh
-		}
 		// Create Auth
 		if err = r.createAuth(ctx, instance); err != nil {
 			log.Info("failed to create Auth")
@@ -269,7 +262,7 @@ func (r *DSCInitializationReconciler) Reconcile(ctx context.Context, req ctrl.Re
 		}
 
 		// Finish reconciling
-		_, err = status.UpdateWithRetry[*dsciv1.DSCInitialization](ctx, r.Client, instance, func(saved *dsciv1.DSCInitialization) {
+		_, err = status.UpdateWithRetry(ctx, r.Client, instance, func(saved *dsciv1.DSCInitialization) {
 			status.SetCompleteCondition(&saved.Status.Conditions, status.ReconcileCompleted, status.ReconcileCompletedMessage)
 			saved.Status.Phase = status.PhaseReady
 		})
