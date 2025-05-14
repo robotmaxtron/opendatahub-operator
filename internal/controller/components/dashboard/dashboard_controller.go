@@ -19,7 +19,6 @@ package dashboard
 import (
 	"context"
 	"fmt"
-
 	consolev1 "github.com/openshift/api/console/v1"
 	routev1 "github.com/openshift/api/route/v1"
 	appsv1 "k8s.io/api/apps/v1"
@@ -68,6 +67,10 @@ func (s *componentHandler) NewComponentReconciler(ctx context.Context, mgr ctrl.
 		OwnsGVK(gvk.OdhApplication, reconciler.Dynamic()).
 		OwnsGVK(gvk.OdhDocument, reconciler.Dynamic()).
 		OwnsGVK(gvk.OdhQuickStart, reconciler.Dynamic()).
+		Watches(
+			&corev1.Secret{},
+			reconciler.WithPredicates(secretPredicates),
+		).
 		// CRDs are not owned by the component and should be left on the cluster,
 		// so by default, the deploy action won't add all the annotation added to
 		// other resources. Hence, a custom handling is required in order to minimize
@@ -86,6 +89,7 @@ func (s *componentHandler) NewComponentReconciler(ctx context.Context, mgr ctrl.
 			reconciler.Dynamic(),
 			reconciler.WithPredicates(resources.Deleted()),
 		).
+		WithAction(secretReconcile).
 		WithAction(initialize).
 		WithAction(devFlags).
 		WithAction(setKustomizedParams).

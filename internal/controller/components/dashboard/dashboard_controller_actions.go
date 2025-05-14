@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	k8serr "k8s.io/apimachinery/pkg/api/errors"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 	"strings"
 
 	routev1 "github.com/openshift/api/route/v1"
@@ -127,5 +129,48 @@ func updateStatus(ctx context.Context, rr *odhtypes.ReconciliationRequest) error
 		d.Status.URL = resources.IngressHost(rl.Items[0])
 	}
 
+	return nil
+}
+
+func secretReconcile(ctx context.Context, rr *odhtypes.ReconciliationRequest) error {
+	evalSecret := rr.Instance.GetObjectKind()
+	if evalSecret.GroupVersionKind() != corev1.SchemeGroupVersion.WithKind("Secret") {
+		log.FromContext(ctx).Info(fmt.Sprintf("Invalid secret %s", evalSecret))
+		return nil
+	}
+
+	foundSecret := rr.Instance.GetObjectKind().(*corev1.Secret)
+	err := rr.Client.Get(ctx, client.ObjectKeyFromObject(rr.Instance), client.Object(foundSecret))
+	if err != nil {
+		if !k8serr.IsNotFound(err) {
+			log.FromContext(ctx).Error(err, fmt.Sprintf("Unable to retrieve secret %s/%s", foundSecret.Namespace, foundSecret.Name))
+		}
+
+		log.FromContext(ctx).Info(fmt.Sprintf("Processing secret %s/%s", foundSecret.Namespace, foundSecret.Name))
+		// If Secret is deleted, delete OAuthClient if exists
+		err = deleteOAuthClient(ctx, client.ObjectKeyFromObject(rr.Instance), rr.Client)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	// Generate the secret if it does not previously exist
+	generatedSecret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      foundSecret.Name + "-generated",
+			Namespace: foundSecret.Namespace,
+		},
+	}
+
+	err = rr.Client.Get(ctx, client.ObjectKeyFromObject(generatedSecret), generatedSecret)
+	if err != nil || !k8serr.IsNotFound(err) {
+		return err
+	}
+
+	err = generateSecret(ctx, foundSecret, generatedSecret, rr)
+	if err != nil {
+		return err
+	}
 	return nil
 }
