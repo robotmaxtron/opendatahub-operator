@@ -39,7 +39,7 @@ func NewLogConstructor(name string) func(logr.Logger, *admission.Request) logr.L
 	}
 }
 
-// CountObjects returns the number of objects of the given GroupVersionKind in the cluster.
+// CountObjects returns the number of objects for the given GroupVersionKind in the cluster.
 //
 // Parameters:
 //   - ctx: Context for the API call.

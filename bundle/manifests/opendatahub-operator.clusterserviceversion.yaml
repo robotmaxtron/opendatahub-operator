@@ -114,7 +114,7 @@ metadata:
     categories: AI/Machine Learning, Big Data
     certified: "False"
     containerImage: quay.io/opendatahub/opendatahub-operator:v2.31.0
-    createdAt: "2025-07-11T06:55:33Z"
+    createdAt: "2025-07-18T12:44:03Z"
     operators.operatorframework.io/builder: operator-sdk-v1.39.2
     operators.operatorframework.io/internal-objects: '["featuretrackers.features.opendatahub.io",
       "codeflares.components.platform.opendatahub.io", "dashboards.components.platform.opendatahub.io",
@@ -1169,6 +1169,40 @@ spec:
           verbs:
           - '*'
         - apiGroups:
+          - servicebinding.io
+          resources:
+          - clusterworkloadresourcemappings
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - servicebinding.io
+          resources:
+          - servicebindings
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - servicebinding.io
+          resources:
+          - servicebindings/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - servicebinding.io
+          resources:
+          - servicebindings/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
           - services.platform.opendatahub.io
           resources:
           - auths
@@ -1363,7 +1397,7 @@ spec:
                   value: /opt/manifests
                 - name: ODH_PLATFORM_TYPE
                   value: OpenDataHub
-                image: REPLACE_IMAGE:latest
+                image: quay.io/mwhittinrhoai/opendatahub-operator:latest
                 imagePullPolicy: Always
                 livenessProbe:
                   httpGet:
@@ -1532,3 +1566,24 @@ spec:
     targetPort: 9443
     type: ValidatingAdmissionWebhook
     webhookPath: /validate-dscinitialization
+  - admissionReviewVersions:
+    - v1
+    - v1beta1
+    containerPort: 443
+    deploymentName: opendatahub-operator-controller-manager
+    failurePolicy: Fail
+    generateName: v1.servicebindings.servicebinding.io
+    rules:
+    - apiGroups:
+      - servicebinding.io
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - servicebindings
+    sideEffects: None
+    targetPort: 9443
+    type: ValidatingAdmissionWebhook
+    webhookPath: /validate-servicebinding-io-v1-servicebinding

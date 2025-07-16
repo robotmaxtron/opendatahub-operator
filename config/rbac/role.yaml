@@ -918,6 +918,40 @@ rules:
   verbs:
   - '*'
 - apiGroups:
+  - servicebinding.io
+  resources:
+  - clusterworkloadresourcemappings
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - servicebinding.io
+  resources:
+  - servicebindings
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - servicebinding.io
+  resources:
+  - servicebindings/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - servicebinding.io
+  resources:
+  - servicebindings/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
   - services.platform.opendatahub.io
   resources:
   - auths

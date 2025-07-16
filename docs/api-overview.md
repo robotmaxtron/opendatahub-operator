@@ -2528,13 +2528,17 @@ _Appears in:_
 
 ## services.platform.opendatahub.io/v1alpha1
 
-Package v1 contains API Schema definitions for the services v1 API group
+Package v1alpha1 contains API Schema definitions for the services v1 API group
 
 ### Resource Types
 - [Auth](#auth)
 - [AuthList](#authlist)
+- [ClusterWorkloadResourceMapping](#clusterworkloadresourcemapping)
+- [ClusterWorkloadResourceMappingList](#clusterworkloadresourcemappinglist)
 - [Monitoring](#monitoring)
 - [MonitoringList](#monitoringlist)
+- [ServiceBinding](#servicebinding)
+- [ServiceBindingList](#servicebindinglist)
 
 
 
@@ -2615,6 +2619,108 @@ _Appears in:_
 | `conditions` _[Condition](#condition) array_ |  |  |  |
 
 
+#### ClusterWorkloadResourceMapping
+
+
+
+ClusterWorkloadResourceMapping is the Schema for the clusterworkloadresourcemappings API
+
+
+
+_Appears in:_
+- [ClusterWorkloadResourceMappingList](#clusterworkloadresourcemappinglist)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `services.platform.opendatahub.io/v1alpha1` | | |
+| `kind` _string_ | `ClusterWorkloadResourceMapping` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `spec` _[ClusterWorkloadResourceMappingSpec](#clusterworkloadresourcemappingspec)_ |  |  |  |
+
+
+#### ClusterWorkloadResourceMappingContainer
+
+
+
+ClusterWorkloadResourceMappingContainer defines the mapping for a specific fragment of a workload resource
+to a Container-like structure.
+
+
+Each mapping defines exactly one path that may match multiple container-like fragments within the workload
+resource. For each object matching the path, the name, env and volumeMounts expressions are resolved to find those
+structures.
+
+
+
+_Appears in:_
+- [ClusterWorkloadResourceMappingTemplate](#clusterworkloadresourcemappingtemplate)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `path` _string_ | Path is the JSONPath within the workload resource that matches an existing fragment that is container-like. |  |  |
+| `name` _string_ | Name is a Restricted JSONPath that references the name of the container with the container-like workload resource<br />fragment. If not defined, container name filtering is ignored. |  |  |
+| `env` _string_ | Env is a Restricted JSONPath that references the slice of environment variables for the container with the<br />container-like workload resource fragment. The referenced location is created if it does not exist. Defaults<br />to `.envs`. |  |  |
+| `volumeMounts` _string_ | VolumeMounts is a Restricted JSONPath that references the slice of volume mounts for the container with the<br />container-like workload resource fragment. The referenced location is created if it does not exist. Defaults<br />to `.volumeMounts`. |  |  |
+
+
+#### ClusterWorkloadResourceMappingList
+
+
+
+ClusterWorkloadResourceMappingList contains a list of ClusterWorkloadResourceMapping
+
+
+
+
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `services.platform.opendatahub.io/v1alpha1` | | |
+| `kind` _string_ | `ClusterWorkloadResourceMappingList` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ListMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#listmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `items` _[ClusterWorkloadResourceMapping](#clusterworkloadresourcemapping) array_ |  |  |  |
+
+
+#### ClusterWorkloadResourceMappingSpec
+
+
+
+ClusterWorkloadResourceMappingSpec defines the desired state of ClusterWorkloadResourceMapping
+
+
+
+_Appears in:_
+- [ClusterWorkloadResourceMapping](#clusterworkloadresourcemapping)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `versions` _[ClusterWorkloadResourceMappingTemplate](#clusterworkloadresourcemappingtemplate) array_ | Versions is the collection of versions for a given resource, with mappings. |  |  |
+
+
+#### ClusterWorkloadResourceMappingTemplate
+
+
+
+ClusterWorkloadResourceMappingTemplate defines the mapping for a specific version of an workload resource to a
+logical PodTemplateSpec-like structure.
+
+
+
+_Appears in:_
+- [ClusterWorkloadResourceMappingSpec](#clusterworkloadresourcemappingspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `version` _string_ | Version is the version of the workload resource that this mapping is for. |  |  |
+| `annotations` _string_ | Annotations is a Restricted JSONPath that references the annotation map within the workload resource. These<br />annotations must end up in the resulting Pod and are generally not the workload resource's annotations.<br />Defaults to `.spec.template.metadata.annotations`. |  |  |
+| `containers` _[ClusterWorkloadResourceMappingContainer](#clusterworkloadresourcemappingcontainer) array_ | Containers is the collection of mappings to container-like fragments of the workload resource. Defaults to<br />mappings appropriate for a PodSpecable resource. |  |  |
+| `volumes` _string_ | Volumes is a Restricted JSONPath that references the slice of volumes within the workload resource. Defaults to<br />`.spec.template.spec.volumes`. |  |  |
+
+
 #### DSCIMonitoring
 
 
@@ -2631,6 +2737,28 @@ _Appears in:_
 | `managementState` _[ManagementState](#managementstate)_ | Set to one of the following values:<br /><br />- "Managed" : the operator is actively managing the component and trying to keep it active.<br />              It will only upgrade the component if it is safe to do so<br /><br />- "Removed" : the operator is actively managing the component and will not install it,<br />              or if it is installed, the operator will try to remove it |  | Enum: [Managed Removed] <br /> |
 | `namespace` _string_ | monitoring spec exposed to DSCI api<br />Namespace for monitoring if it is enabled | opendatahub | MaxLength: 63 <br />Pattern: `^([a-z0-9]([-a-z0-9]*[a-z0-9])?)?$` <br /> |
 | `metrics` _[Metrics](#metrics)_ | metrics collection |  |  |
+
+
+
+
+
+
+#### EnvMapping
+
+
+
+EnvMapping defines a mapping from the value of a Secret entry to an environment variable
+
+
+
+_Appears in:_
+- [DSCServiceBinding](#dscservicebinding)
+- [ServiceBindingSpec](#servicebindingspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _string_ | Name is the name of the environment variable |  |  |
+| `key` _string_ | Key is the key in the Secret that will be exposed |  |  |
 
 
 #### Metrics
@@ -2783,5 +2911,145 @@ _Appears in:_
 | `observedGeneration` _integer_ | The generation observed by the resource controller. |  |  |
 | `conditions` _[Condition](#condition) array_ |  |  |  |
 | `url` _string_ |  |  |  |
+
+
+#### ServiceBinding
+
+
+
+ServiceBinding is the Schema for the ServiceBinding API
+
+
+
+_Appears in:_
+- [ServiceBindingList](#servicebindinglist)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `services.platform.opendatahub.io/v1alpha1` | | |
+| `kind` _string_ | `ServiceBinding` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `spec` _[ServiceBindingSpec](#servicebindingspec)_ |  |  |  |
+| `status` _[ServiceBindingStatus](#servicebindingstatus)_ |  |  |  |
+
+
+#### ServiceBindingList
+
+
+
+ServiceBindingList contains a list of ServiceBinding
+
+
+
+
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `services.platform.opendatahub.io/v1alpha1` | | |
+| `kind` _string_ | `ServiceBindingList` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ListMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#listmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `items` _[ServiceBinding](#servicebinding) array_ |  |  |  |
+
+
+#### ServiceBindingSecretReference
+
+
+
+ServiceBindingSecretReference defines a mirror of corev1.LocalObjectReference
+
+
+
+_Appears in:_
+- [DSCServiceBindingStatus](#dscservicebindingstatus)
+- [ServiceBindingStatus](#servicebindingstatus)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _string_ | Name of the referent secret.<br />More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names |  |  |
+
+
+#### ServiceBindingServiceReference
+
+
+
+ServiceBindingServiceReference defines a subset of corev1.ObjectReference
+
+
+
+_Appears in:_
+- [DSCServiceBinding](#dscservicebinding)
+- [ServiceBindingSpec](#servicebindingspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | API version of the referent. |  |  |
+| `kind` _string_ | Kind of the referent.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `name` _string_ | Name of the referent.<br />More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names |  |  |
+
+
+#### ServiceBindingSpec
+
+
+
+ServiceBindingSpec defines the desired state of ServiceBinding
+
+
+
+_Appears in:_
+- [DSCServiceBinding](#dscservicebinding)
+- [ServiceBinding](#servicebinding)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _string_ | Name is the name of the service as projected into the workload container.  Defaults to .metadata.name. |  |  |
+| `type` _string_ | Type is the type of the service as projected into the workload container |  |  |
+| `provider` _string_ | Provider is the provider of the service as projected into the workload container |  |  |
+| `workload` _[ServiceBindingWorkloadReference](#servicebindingworkloadreference)_ | Workload is a reference to an object |  |  |
+| `service` _[ServiceBindingServiceReference](#servicebindingservicereference)_ | Service is a reference to an object that fulfills the ProvisionedService duck type |  |  |
+| `env` _[EnvMapping](#envmapping) array_ | Env is the collection of mappings from Secret entries to environment variables |  |  |
+
+
+#### ServiceBindingStatus
+
+
+
+ServiceBindingStatus defines the observed state of ServiceBinding
+
+
+
+_Appears in:_
+- [DSCServiceBindingStatus](#dscservicebindingstatus)
+- [ServiceBinding](#servicebinding)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `observedGeneration` _integer_ | ObservedGeneration is the 'Generation' of the ServiceBinding that<br />was last processed by the controller. |  |  |
+| `conditions` _[Condition](#condition) array_ | Conditions are the conditions of this ServiceBinding |  |  |
+| `binding` _[ServiceBindingSecretReference](#servicebindingsecretreference)_ | Binding exposes the projected secret for this ServiceBinding |  |  |
+
+
+#### ServiceBindingWorkloadReference
+
+
+
+ServiceBindingWorkloadReference defines a subset of corev1.ObjectReference with extensions
+
+
+
+_Appears in:_
+- [DSCServiceBinding](#dscservicebinding)
+- [ServiceBindingSpec](#servicebindingspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | API version of the referent. |  |  |
+| `kind` _string_ | Kind of the referent.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `name` _string_ | Name of the referent.<br />More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names |  |  |
+| `selector` _[LabelSelector](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#labelselector-v1-meta)_ | Selector is a query that selects the workload or workloads to bind the service to |  |  |
+| `containers` _string array_ | Containers describe which containers in a Pod should be bound to |  |  |
 
 
